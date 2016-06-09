@@ -121,21 +121,10 @@ func TestHisto(t *testing.T) {
 
 	metrics := h.Flush(10 * time.Second)
 	// We get lots of metrics back for histograms!
-	assert.Len(t, metrics, 4, "Flushed metrics length")
-
-	// First the count
-	m1 := metrics[0]
-	assert.Equal(t, "a.b.c.count", m1.Name, "Name")
-	assert.Equal(t, int32(10), m1.Interval, "Interval")
-	assert.Equal(t, "rate", m1.MetricType, "Type")
-	assert.Len(t, m1.Tags, 1, "Tag count")
-	assert.Equal(t, "a:b", m1.Tags[0], "First tag")
-
-	// The counter returns an array with a single tuple of timestamp,value
-	assert.Equal(t, float64(0.5), m1.Value[0][1], "Value")
+	assert.Len(t, metrics, 3, "Flushed metrics length")
 
 	// Now the max
-	m2 := metrics[1]
+	m2 := metrics[0]
 	assert.Equal(t, "a.b.c.max", m2.Name, "Name")
 	assert.Equal(t, int32(0), m2.Interval, "Interval")
 	assert.Equal(t, "gauge", m2.MetricType, "Type")
@@ -145,7 +134,7 @@ func TestHisto(t *testing.T) {
 	assert.Equal(t, float64(25), m2.Value[0][1], "Value")
 
 	// Now the min
-	m3 := metrics[2]
+	m3 := metrics[1]
 	assert.Equal(t, "a.b.c.min", m3.Name, "Name")
 	assert.Equal(t, int32(0), m3.Interval, "Interval")
 	assert.Equal(t, "gauge", m3.MetricType, "Type")
@@ -155,7 +144,7 @@ func TestHisto(t *testing.T) {
 	assert.Equal(t, float64(5), m3.Value[0][1], "Value")
 
 	// And the percentile
-	m4 := metrics[3]
+	m4 := metrics[2]
 	assert.Equal(t, "a.b.c.50percentile", m4.Name, "Name")
 	assert.Equal(t, int32(0), m4.Interval, "Interval")
 	assert.Equal(t, "gauge", m4.MetricType, "Type")
@@ -180,10 +169,5 @@ func TestHistoSampleRate(t *testing.T) {
 	h.Sample(25, 0.5)
 
 	metrics := h.Flush(10 * time.Second)
-	assert.Len(t, metrics, 4, "Metrics flush length")
-
-	// First the count
-	m1 := metrics[0]
-	assert.Equal(t, "a.b.c.count", m1.Name, "Count name")
-	assert.Equal(t, float64(1), m1.Value[0][1], "Sampled count as rate")
+	assert.Len(t, metrics, 3, "Metrics flush length")
 }

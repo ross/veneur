@@ -4,6 +4,7 @@ import (
 	"flag"
 	"hash/fnv"
 	"net"
+	"strings"
 	"sync"
 	"time"
 
@@ -178,4 +179,21 @@ func handlePacket(workers []*veneur.Worker, packet []byte) {
 	// We're ready to have a worker process this packet, so add it
 	// to the work queue.
 	workers[m.Digest%uint32(veneur.Config.NumWorkers)].WorkChan <- *m
+
+	if m.Type == "histogram" {
+		counterMetric := veneur.Metric{
+			Name:       m.Name + ".count",
+			Value:      1.0,
+			Type:       "counter",
+			SampleRate: 1.0,
+			Tags:       m.Tags,
+		}
+		digester := fnv.New32()
+		digester.Write([]byte(counterMetric.Name))
+		digester.Write([]byte(counterMetric.Type))
+		digester.Write([]byte(strings.Join(counterMetric.Tags, ",")))
+		counterMetric.Digest = digester.Sum32()
+
+		workers[m.Digest%uint32(veneur.Config.NumWorkers)].WorkChan <- *m
+	}
 }

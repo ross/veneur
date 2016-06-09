@@ -166,15 +166,7 @@ func NewHist(name string, tags []string, percentiles []float64) *Histo {
 // Histo.
 func (h *Histo) Flush(interval time.Duration) []DDMetric {
 	now := float64(time.Now().Unix())
-	rate := float64(h.count) / interval.Seconds()
 	metrics := []DDMetric{
-		{
-			Name:       fmt.Sprintf("%s.count", h.name),
-			Value:      [1][2]float64{{now, rate}},
-			Tags:       h.tags,
-			MetricType: "rate",
-			Interval:   int32(interval.Seconds()),
-		},
 		{
 			Name:       fmt.Sprintf("%s.max", h.name),
 			Value:      [1][2]float64{{now, h.max}},
