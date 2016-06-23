@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/pkg/profile"
 	"github.com/stripe/veneur"
 )
 
@@ -14,6 +15,7 @@ var (
 )
 
 func main() {
+	defer profile.Start(profile.CPUProfile).Stop()
 	flag.Parse()
 
 	if configFile == nil || *configFile == "" {
